@@ -1,6 +1,6 @@
-import React from 'react';
-import { FaPen } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import React from 'react'
+import { FaPen } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 const EditBtn = ({ link }) => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const EditBtn = ({ link }) => {
     >
       <FaPen />
     </button>
-  );
-};
+  )
+}
 
-export default EditBtn;
+export default EditBtn
