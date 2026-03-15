@@ -1,6 +1,8 @@
 import React from 'react'
 import Table from '../../components/table/Table'
 import user from '../../assets/images/user.jpg'
+import Title from '../../components/ui/Title';
+import AddBtn from '../../components/buttons/AddBtn';
 
 const Index = () => {
   const columns = [
@@ -29,13 +31,20 @@ const Index = () => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      onView={(row) => alert('View ' + row.caseNo)}
-      onEdit={(row) => `/clients/edit/${row.id}`}
-      onDelete={(row) => alert('Delete ' + row.caseNo)}
-    />
+    <>
+        <div className='d-flex justify-content-between align-items-center mb-3'>
+            <Title title='Clients' />
+            <AddBtn title='Client' to='/clients/create'/>
+        </div>
+
+        <Table
+        columns={columns}
+        data={data}
+        onView={(row) => alert('View ' + row.caseNo)}
+        onEdit={(row) => `/clients/edit/${row.id}`}
+        onDelete={(row) => alert('Delete ' + row.caseNo)}
+        />
+    </>
   )
 }
 
