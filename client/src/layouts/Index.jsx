@@ -26,7 +26,7 @@ const Index = () => {
       <Header />
       <Sidebar navItems={userRole === 'admin' ? adminNavItems : userNavItems} />
       
-      <div className='content-wrapper'>
+      <div className='content-wrapper p-3'>
         <Outlet />
       </div>
     
