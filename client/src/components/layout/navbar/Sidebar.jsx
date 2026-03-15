@@ -16,14 +16,14 @@ const Sidebar = ({navItems}) => {
         {/* Sidebar  */}
         <div className='sidebar'>
             {/* Sidebar user panel */}
-            <div className='user-panel mt-3 pb-3 mb-3 d-flex mx-0'>
+            <Link to='/profile' className='user-panel mt-3 pb-3 mb-3 d-flex mx-0'>
                 <div className='image'>
                     <img src={user} className='img-circle elevation-2' alt='User Image' />
                 </div>
                 <div className='info'>
-                    <Link to='#' className='d-block'>User</Link>
+                    <span className='d-block'>User</span>
                 </div>
-            </div>
+            </Link>
 
             {/* Sidebar Menu */}
             <nav className='mt-2'>
