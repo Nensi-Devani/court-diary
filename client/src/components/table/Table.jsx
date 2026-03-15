@@ -3,7 +3,7 @@ import Row from './Row'
 
 const Table = ({ columns, data, onView, onEdit, onDelete }) => {
   return (
-    <div className='card'>
+    <div className='card mx-3'>
       <div className='card-body p-0'>
         <table className='table table-striped text-center'>
           <thead>
