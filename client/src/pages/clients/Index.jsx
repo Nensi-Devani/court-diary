@@ -2,7 +2,7 @@ import React from 'react'
 import Table from '../../components/table/Table'
 import user from '../../assets/images/user.jpg'
 import Title from '../../components/ui/Title';
-import AddBtn from '../../components/buttons/AddBtn';
+import AddBtn from '../../components/buttons/AddBtn'
 
 const Index = () => {
   const columns = [
@@ -10,7 +10,7 @@ const Index = () => {
     { key: 'clientImage', label: 'Client', type: 'image' },
     { key: 'clientName', label: 'Name', type: 'text' },
     { key: 'clientMobile', label: 'Mobile', type: 'text' },
-    { key: 'activeCases', label: 'Actiive Cases', type: 'badge', badgeClass: 'bg-success' },
+    { key: 'activeCases', label: 'Active Cases', type: 'badge', badgeClass: 'bg-success' },
   ];
 
   const data = [
@@ -38,11 +38,11 @@ const Index = () => {
         </div>
 
         <Table
-        columns={columns}
-        data={data}
-        onView={(row) => alert('View ' + row.caseNo)}
-        onEdit={(row) => `/clients/edit/${row.id}`}
-        onDelete={(row) => alert('Delete ' + row.caseNo)}
+          columns={columns}
+          data={data}
+          onView={(row) => `/clients/view/${row.id}`}
+          onEdit={(row) => `/clients/edit/${row.id}`}
+          onDelete={(row) => alert('Delete ' + row.caseNo)}
         />
     </>
   )
