@@ -25,7 +25,7 @@ const Row = ({ row, columns, onView, onEdit, onDelete }) => {
         ))}
       
         <td>
-            <ViewBtn onClick={() => onView(row)} />
+            <ViewBtn link={onView(row)} />
             <EditBtn link={onEdit(row)} />
             <DeleteBtn onClick={() => onDelete(row)} />
         </td>
