@@ -58,7 +58,7 @@ const Index = () => {
         <Table
             columns={columns}
             data={data}
-            onView={(row) => `/clients/view/${row.id}`}
+            onView={(row) => `/cases/view/${row.id}`}
             onEdit={(row) => `/cases/edit/${row.id}`}
             onDelete={(row) => alert('Delete ' + row.caseNo)}
         />
