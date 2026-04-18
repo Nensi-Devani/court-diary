@@ -25,20 +25,28 @@ import Profile from '../pages/profile/Index'
 import ProfileEdit from '../pages/profile/Edit'
 import ProfileChangePassword from '../pages/profile/ChangePassword'
 
+import Register from '../pages/auth/Register'
+import ForgotPassword from '../pages/auth/ForgotPassword'
+
+
 const AppRoutes = () => {
   return (
     <Routes>
 
       {/* Auth */}
       <Route path='/login' element={<Login />} />
+      <Route path='/register' element={<Register />} />
+      <Route path='/forgot-password' element={<ForgotPassword />} />
 
 
       <Route path='/' element={<Layout />}>        
        
-        {/* Profile */}
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/profile/edit' element={<ProfileEdit />} />
-
+       {/* Profile */}
+        <Route path='profile'>
+          <Route index element={<Profile />} />     
+          <Route path='edit' element={<ProfileEdit />} />
+          <Route path='change-password' element={<ProfileChangePassword />} />
+        </Route>
 
         {/* User Routes */}
         <Route index element={<Dashboard />} />
@@ -46,11 +54,7 @@ const AppRoutes = () => {
         {/* Meetings */}
         <Route path='meetings'>
           <Route index element={<MeetingsIndex />} />
-          {/* <Route path='create' element={<MeetingCreate />} />
-          <Route path=':id' element={<MeetingView />} />
-          <Route path=':id/edit' element={<MeetingEdit />}  /> */}
         </Route>
-        <Route index element={<Dashboard />} />
 
         {/* Cases */}
         <Route path='cases'>
@@ -75,14 +79,6 @@ const AppRoutes = () => {
 
         {/* User Routes */}
         <Route index element={<AdminDashboard />} />
-
-        {/* Meetings */}
-        <Route path='meetings'>
-          <Route index element={<MeetingsIndex />} />
-          {/* <Route path='create' element={<MeetingCreate />} />
-          <Route path=':id' element={<MeetingView />} />
-          <Route path=':id/edit' element={<MeetingEdit />}  /> */}
-        </Route>
 
         {/* Lawyers */}
         <Route path='lawyers'>
