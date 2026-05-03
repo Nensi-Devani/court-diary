@@ -1,32 +1,78 @@
-import { useState } from 'react'
-import Title from '../../components/ui/Title'
-import FormInput from '../../components/form/FormInput'
-import ImageUpload from '../../components/form/ImageUpload'
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import Title from '../../components/ui/Title';
+import FormInput from '../../components/form/FormInput';
+import ImageUpload from '../../components/form/ImageUpload';
 
-const Create = () => {
+const Edit = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    mobile: '',
+    phone: '',
     address: '',
     description: '',
   });
 
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchClient = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`http://localhost:5000/api/clients/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const client = res.data.data;
+        setFormData({
+          name: client.name || '',
+          phone: client.phone || '',
+          address: client.address || '',
+          description: client.description || '',
+        });
+      } catch (err) {
+        toast.error('Failed to load client details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClient();
+  }, [id]);
 
   const handleImageSelect = (file) => {
     setImageFile(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const data = {
-      ...formData,
-      image: imageFile,
-    };
-
-    console.log('Client Data:', data);
+    try {
+      const token = localStorage.getItem("token");
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('phone', formData.phone);
+      data.append('address', formData.address);
+      data.append('description', formData.description);
+      if (imageFile) {
+        data.append('avatar', imageFile);
+      }
+      
+      await axios.put(`http://localhost:5000/api/clients/${id}`, data, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      toast.success('Client updated successfully');
+      navigate('/clients');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update client');
+    }
   };
+
+  if (loading) return <div className="p-4 text-center">Loading...</div>;
 
   return (
     <>
@@ -47,7 +93,7 @@ const Create = () => {
                 <FormInput
                   label='Name'
                   name='name'
-                  value='Ramesh'
+                  value={formData.name}
                   setFormData={setFormData}
                   placeholder='Enter client name'
                   required
@@ -56,8 +102,8 @@ const Create = () => {
 
                 <FormInput
                   label='Mobile'
-                  name='mobile'
-                  value='1234567890'
+                  name='phone'
+                  value={formData.phone}
                   setFormData={setFormData}
                   placeholder='Enter mobile'
                   required
@@ -69,7 +115,7 @@ const Create = () => {
                 <FormInput
                   label='Address'
                   name='address'
-                  value='This is a demo address'
+                  value={formData.address}
                   setFormData={setFormData}
                   placeholder='Enter address'
                   required
@@ -81,7 +127,7 @@ const Create = () => {
                 <FormInput
                   label='Other Description'
                   name='description'
-                  value='Other Desctiption about Ramesh'
+                  value={formData.description}
                   setFormData={setFormData}
                   placeholder='Enter description'
                   required
@@ -94,14 +140,14 @@ const Create = () => {
 
             <div className='card-footer text-center'>
               <button type='submit' className='btn btn-primary px-4'>
-                Edit
+                Update
               </button>
             </div>
           </form>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Create
+export default Edit;

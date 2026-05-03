@@ -1,35 +1,84 @@
-// src/pages/lawyers/Create.jsx
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import Title from '../../../components/ui/Title';
 import FormInput from '../../../components/form/FormInput';
 import ImageUpload from '../../../components/form/ImageUpload';
 
-const Create = () => {
+const Edit = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
     email: '',
+    officeName: '',
     officeEmail: '',
     officeContact: '',
     officeAddress: '',
   });
 
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLawyer = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`http://localhost:5000/api/users/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const lawyer = res.data.data;
+        setFormData({
+          name: lawyer.name || '',
+          mobile: lawyer.phone || '',
+          email: lawyer.email || '',
+          officeName: lawyer.office?.name || '',
+          officeEmail: lawyer.office?.email || '',
+          officeContact: lawyer.office?.phone || '',
+          officeAddress: lawyer.office?.address || '',
+        });
+      } catch (err) {
+        toast.error('Failed to load lawyer details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLawyer();
+  }, [id]);
 
   const handleImageSelect = (file) => {
     setImageFile(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`http://localhost:5000/api/users/${id}`, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-    const data = {
-      ...formData,
-      image: imageFile,
-    };
+      if (imageFile) {
+        const ad = new FormData();
+        ad.append('avatar', imageFile);
+        await axios.put(`http://localhost:5000/api/users/${id}/avatar`, ad, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          },
+        });
+      }
 
-    console.log('Lawyer Data:', data);
+      toast.success('Lawyer updated successfully');
+      navigate('/admin/lawyers');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update lawyer');
+    }
   };
+
+  if (loading) return <div className="p-4 text-center">Loading...</div>;
 
   return (
     <>
@@ -52,7 +101,7 @@ const Create = () => {
                 <FormInput
                   label='Name'
                   name='name'
-                  value='Rohan'
+                  value={formData.name}
                   setFormData={setFormData}
                   placeholder='Enter name'
                   required
@@ -62,7 +111,7 @@ const Create = () => {
                 <FormInput
                   label='Mobile'
                   name='mobile'
-                  value='1234567890'
+                  value={formData.mobile}
                   setFormData={setFormData}
                   placeholder='Enter mobile'
                   required
@@ -76,7 +125,7 @@ const Create = () => {
                   label='Email'
                   name='email'
                   type='email'
-                  value='rohan@gmail.com'
+                  value={formData.email}
                   setFormData={setFormData}
                   placeholder='Enter email'
                   required
@@ -87,7 +136,7 @@ const Create = () => {
                   label='Office Name'
                   name='officeName'
                   type='text'
-                  value='R Laws'
+                  value={formData.officeName}
                   setFormData={setFormData}
                   placeholder='Enter office name'
                   className='col-md-6'
@@ -100,7 +149,7 @@ const Create = () => {
                   label='Office Email'
                   name='officeEmail'
                   type='email'
-                  value='r.laws@gmail.com'
+                  value={formData.officeEmail}
                   setFormData={setFormData}
                   placeholder='Enter office email'
                   className='col-md-6'
@@ -109,7 +158,7 @@ const Create = () => {
                 <FormInput
                   label='Office Contact'
                   name='officeContact'
-                  value='1122334422'
+                  value={formData.officeContact}
                   setFormData={setFormData}
                   placeholder='Enter office contact'
                   className='col-md-6'
@@ -121,7 +170,7 @@ const Create = () => {
                 <FormInput
                   label='Office Address'
                   name='officeAddress'
-                  value='Rohan office address'
+                  value={formData.officeAddress}
                   setFormData={setFormData}
                   placeholder='Enter office address'
                   as='textarea'
@@ -134,7 +183,7 @@ const Create = () => {
 
             <div className='card-footer text-center'>
               <button type='submit' className='btn btn-primary px-4'>
-                Edit
+                Update
               </button>
             </div>
 
@@ -145,4 +194,4 @@ const Create = () => {
   );
 };
 
-export default Create
+export default Edit;

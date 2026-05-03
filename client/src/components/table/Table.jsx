@@ -1,7 +1,7 @@
 import React from 'react'
 import Row from './Row'
 
-const Table = ({ columns, data, onView, onEdit, onDelete }) => {
+const Table = ({ columns, data, onView, onEdit, onDelete, actions }) => {
   return (
     <div className='card mx-3'>
       <div className='card-body p-0'>
@@ -15,7 +15,13 @@ const Table = ({ columns, data, onView, onEdit, onDelete }) => {
             </tr>
           </thead>
           <tbody>
-            {data.map((row, idx) => (
+            {data.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length + 1} className="text-center py-4 text-muted">
+                  No records found
+                </td>
+              </tr>
+            ) : data.map((row, idx) => (
               <Row
                 key={idx}
                 row={row}
@@ -23,6 +29,7 @@ const Table = ({ columns, data, onView, onEdit, onDelete }) => {
                 onView={onView}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                actions={actions}
               />
             ))}
           </tbody>

@@ -1,31 +1,50 @@
-import React from 'react'
-import userImg from '../../assets/images/user.jpg'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import userImg from '../../assets/images/user.jpg';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/users/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setProfile(res.data.data);
+      } catch (err) {
+        toast.error('Failed to load profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  if (loading) return <div className="p-4 text-center">Loading...</div>;
+  if (!profile) return <div className="p-4 text-center">Profile not found</div>;
+
   return (
     <div className="container py-4" style={{ maxWidth: '500px' }}>
-      
       {/* Profile Card */}
       <div className="card card-primary card-outline text-center">
         <div className="card-body box-profile">
-          
           <div className="text-center">
             <img
               className="profile-user-img img-fluid img-circle"
-              src={userImg}
+              src={profile.avatar || userImg}
               alt="User profile"
-              style={{ width: '100px', height: '100px' }}
+              style={{ width: '100px', height: '100px', objectFit: 'cover' }}
             />
           </div>
 
           <h3 className="profile-username text-center mt-2">
-            Nancy Devani
+            {profile.name}
           </h3>
-
-          <p className="text-muted text-center">
-            Criminalc Lawyer
-          </p>
 
           <hr />
 
@@ -33,7 +52,7 @@ const Profile = () => {
             <p className="mb-2">
               <strong>Email</strong>
               <span className="float-right text-primary">
-                nina23@gmail.com
+                {profile.email}
               </span>
             </p>
 
@@ -42,16 +61,7 @@ const Profile = () => {
             <p className="mb-2">
               <strong>Mobile No</strong>
               <span className="float-right text-primary">
-                5433456867
-              </span>
-            </p>
-
-            <hr />
-
-            <p className="mb-2">
-              <strong>Experience</strong>
-              <span className="float-right text-primary">
-                4 years
+                {profile.phone || '-'}
               </span>
             </p>
           </div>
@@ -75,12 +85,22 @@ const Profile = () => {
         </div>
 
         <div className="card-body">
+          {profile.office?.name && (
+            <>
+              <p className="mb-2">
+                <i className="fas fa-building mr-2"></i>
+                <strong>Office Name</strong>
+              </p>
+              <p className="text-muted">{profile.office.name}</p>
+              <hr />
+            </>
+          )}
 
           <p className="mb-2">
             <i className="fas fa-phone-alt mr-2"></i>
             <strong>Office Contact</strong>
           </p>
-          <p className="text-muted">+91 3456796845</p>
+          <p className="text-muted">{profile.office?.phone || '-'}</p>
 
           <hr />
 
@@ -88,7 +108,7 @@ const Profile = () => {
             <i className="fas fa-map-marker-alt mr-2"></i>
             <strong>Office Address</strong>
           </p>
-          <p className="text-muted">Ahemdabad , Gujrat</p>
+          <p className="text-muted">{profile.office?.address || '-'}</p>
 
           <hr />
 
@@ -96,7 +116,7 @@ const Profile = () => {
             <i className="fas fa-envelope mr-2"></i>
             <strong>Work Mail</strong>
           </p>
-          <p className="text-muted">advnina345@gmail.com</p>
+          <p className="text-muted">{profile.office?.email || '-'}</p>
 
         </div>
       </div>
@@ -105,4 +125,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default Profile;

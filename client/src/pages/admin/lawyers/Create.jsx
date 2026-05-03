@@ -1,143 +1,116 @@
-// src/pages/lawyers/Create.jsx
-import { useState } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Title from '../../../components/ui/Title';
-import FormInput from '../../../components/form/FormInput';
+import { toast } from 'react-toastify';
 import ImageUpload from '../../../components/form/ImageUpload';
 
 const Create = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
     email: '',
+    password: 'password123',
+    officeName: '',
     officeEmail: '',
     officeContact: '',
     officeAddress: '',
   });
-
+  const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
 
   const handleImageSelect = (file) => {
     setImageFile(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post('http://localhost:5000/api/users', formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const data = {
-      ...formData,
-      image: imageFile,
-    };
+      if (imageFile) {
+        const ad = new FormData();
+        ad.append('avatar', imageFile);
+        await axios.put(`http://localhost:5000/api/users/${res.data.data._id}/avatar`, ad, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          },
+        });
+      }
 
-    console.log('Lawyer Data:', data);
+      toast.success('Lawyer added successfully');
+      navigate('/admin/lawyers');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to add lawyer');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
-      <Title
-        title="Add Lawyer"
-        breadCrumpParent="Lawyers"
-        breadCrumpParentLink="/admin/lawyers"
-      />
-
+      <Title title="Add Lawyer" breadCrumpParent="Lawyers" breadCrumpParentLink="/admin/lawyers" />
       <div className="container">
         <div className="card">
           <form onSubmit={handleSubmit}>
             <div className="card-body">
-
-              {/* Image Upload */}
               <ImageUpload onImageSelect={handleImageSelect} />
-
-              {/* Name & Mobile */}
               <div className="form-row">
-                <FormInput
-                  label="Name"
-                  name="name"
-                  value={formData.name}
-                  setFormData={setFormData}
-                  placeholder="Enter name"
-                  required
-                  className="col-md-6"
-                />
-
-                <FormInput
-                  label="Mobile"
-                  name="mobile"
-                  value={formData.mobile}
-                  setFormData={setFormData}
-                  placeholder="Enter mobile"
-                  required
-                  className="col-md-6"
-                />
+                <div className="form-group col-md-6">
+                  <label>Name <span className="text-danger">*</span></label>
+                  <input type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} placeholder="Enter name" required />
+                </div>
+                <div className="form-group col-md-6">
+                  <label>Mobile <span className="text-danger">*</span></label>
+                  <input type="text" name="mobile" className="form-control" value={formData.mobile} onChange={handleChange} placeholder="Enter mobile" required />
+                </div>
               </div>
-
-              {/* Email & Office Email */}
               <div className="form-row">
-                <FormInput
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  setFormData={setFormData}
-                  placeholder="Enter email"
-                  required
-                  className="col-md-6"
-                />
-
-                <FormInput
-                  label="Office Name"
-                  name="officeName"
-                  type="text"
-                  value={formData.officeName}
-                  setFormData={setFormData}
-                  placeholder="Enter office name"
-                  className="col-md-6"
-                />
+                <div className="form-group col-md-6">
+                  <label>Email <span className="text-danger">*</span></label>
+                  <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} placeholder="Enter email" required />
+                </div>
+                <div className="form-group col-md-6">
+                  <label>Password</label>
+                  <input type="password" name="password" className="form-control" value={formData.password} onChange={handleChange} placeholder="Default: password123" />
+                </div>
               </div>
-
-              {/* Office Contact */}
               <div className="form-row">
-                   <FormInput
-                  label="Office Email"
-                  name="officeEmail"
-                  type="email"
-                  value={formData.officeEmail}
-                  setFormData={setFormData}
-                  placeholder="Enter office email"
-                  className="col-md-6"
-                />
-
-                <FormInput
-                  label="Office Contact"
-                  name="officeContact"
-                  value={formData.officeContact}
-                  setFormData={setFormData}
-                  placeholder="Enter office contact"
-                  className="col-md-6"
-                />
+                <div className="form-group col-md-6">
+                  <label>Office Name</label>
+                  <input type="text" name="officeName" className="form-control" value={formData.officeName} onChange={handleChange} placeholder="Enter office name" />
+                </div>
+                <div className="form-group col-md-6">
+                  <label>Office Email</label>
+                  <input type="email" name="officeEmail" className="form-control" value={formData.officeEmail} onChange={handleChange} placeholder="Enter office email" />
+                </div>
               </div>
-
-              {/* Office Address */}
               <div className="form-row">
-                <FormInput
-                  label="Office Address"
-                  name="officeAddress"
-                  value={formData.officeAddress}
-                  setFormData={setFormData}
-                  placeholder="Enter office address"
-                  as="textarea"
-                  rows={4}
-                  className="col-md-12"
-                />
+                <div className="form-group col-md-6">
+                  <label>Office Contact</label>
+                  <input type="text" name="officeContact" className="form-control" value={formData.officeContact} onChange={handleChange} placeholder="Enter office contact" />
+                </div>
+                <div className="form-group col-md-6">
+                  <label>Office Address</label>
+                  <input type="text" name="officeAddress" className="form-control" value={formData.officeAddress} onChange={handleChange} placeholder="Enter office address" />
+                </div>
               </div>
-
             </div>
-
             <div className="card-footer text-center">
-              <button type="submit" className="btn btn-primary px-4">
-                Add
+              <button type="submit" className="btn btn-primary px-4" disabled={loading}>
+                {loading ? 'Adding...' : 'Add Lawyer'}
               </button>
             </div>
-
           </form>
         </div>
       </div>
@@ -145,4 +118,4 @@ const Create = () => {
   );
 };
 
-export default Create
+export default Create;

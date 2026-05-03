@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import FormInput from '../../components/form/FormInput';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useGoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
   localStorage.removeItem('email')
@@ -12,18 +15,53 @@ const Login = () => {
     remember: false,
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // store email for role detection
-    localStorage.setItem('email', formData.email);
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email: formData.email,
+        password: formData.password
+      });
 
-    console.log(formData);
-    if(formData.email == 'ndevani894@rku.ac.in')
-      navigate('/admin');
-    else
-    navigate('/');
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userRole", res.data.user.role);
+      localStorage.setItem("userName", res.data.user.name);
+      localStorage.setItem('email', formData.email);
+      toast.success("Login successful!");
+      
+      if(res.data.user.role === 'admin')
+        navigate('/admin');
+      else
+        navigate('/');
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Login failed");
+    }
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await axios.post("http://localhost:5000/api/auth/google", {
+          token: tokenResponse.credential || tokenResponse.access_token,
+        });
+
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userRole", res.data.user.role);
+        localStorage.setItem("userName", res.data.user.name);
+        localStorage.setItem('email', res.data.user.email);
+        toast.success("Google Login successful!");
+        
+        if(res.data.user.role === 'admin')
+          navigate('/admin');
+        else
+          navigate('/');
+      } catch (err) {
+        toast.error("Google Login failed");
+      }
+    },
+    onError: () => toast.error("Google Login failed"),
+  });
 
   return (
     <div className="login-box mx-auto my-5">
@@ -91,7 +129,7 @@ const Login = () => {
               Sign in
             </button>
             <small>OR</small>
-            <button className="btn btn-block btn-danger">
+            <button type="button" onClick={() => handleGoogleLogin()} className="btn btn-block btn-danger">
               Sign in with Google
             </button>
           </div>

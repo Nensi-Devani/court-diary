@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import FormInput from '../../components/form/FormInput';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useGoogleLogin } from '@react-oauth/google';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -13,21 +16,51 @@ const Register = () => {
     retypePassword: '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.retypePassword) {
-      alert('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
-    console.log('Register Data:', formData);
+    try {
+      await axios.post("http://localhost:5000/api/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
 
-    // ✅ store email (optional for role logic)
-    localStorage.setItem('email', formData.email);
-
-    navigate('/');
+      toast.success("Registration successful! Please check your email to verify your account.");
+      navigate('/check-email');
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Registration failed");
+    }
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await axios.post("http://localhost:5000/api/auth/google", {
+          token: tokenResponse.credential || tokenResponse.access_token,
+        });
+
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userRole", res.data.user.role);
+        localStorage.setItem("userName", res.data.user.name);
+        localStorage.setItem('email', res.data.user.email);
+        toast.success("Google Login successful!");
+        
+        if(res.data.user.role === 'admin')
+          navigate('/admin');
+        else
+          navigate('/');
+      } catch (err) {
+        toast.error("Google Login failed");
+      }
+    },
+    onError: () => toast.error("Google Login failed"),
+  });
 
   return (
     <div className="register-box mx-auto my-5">
@@ -88,7 +121,7 @@ const Register = () => {
                   Register
                 </button>
                 <p className='text-center m-0'>OR</p>
-                <button className="btn btn-block btn-danger">
+                <button type="button" onClick={() => handleGoogleLogin()} className="btn btn-block btn-danger">
                     Sign in with Google
                 </button>
               </div>

@@ -52,6 +52,19 @@ const Header = () => {
             <i className='fas fa-expand-arrows-alt'></i>
           </Link>
         </li>
+        <li className='nav-item'>
+          <button
+            className='nav-link btn btn-link text-danger'
+            style={{ border: 'none', background: 'none' }}
+            onClick={() => {
+                localStorage.clear();
+                window.location.href = '/login';
+            }}
+            title="Log Out"
+          >
+            <i className='fas fa-sign-out-alt'></i>
+          </button>
+        </li>
       </ul>
     </nav>
   );

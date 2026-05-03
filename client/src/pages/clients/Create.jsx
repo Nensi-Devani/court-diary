@@ -1,31 +1,57 @@
-import { useState } from 'react'
-import Title from '../../components/ui/Title'
-import FormInput from '../../components/form/FormInput'
-import ImageUpload from '../../components/form/ImageUpload'
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Title from '../../components/ui/Title';
+import FormInput from '../../components/form/FormInput';
+import ImageUpload from '../../components/form/ImageUpload';
 
 const Create = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    mobile: '',
+    phone: '',
     address: '',
     description: '',
   });
 
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleImageSelect = (file) => {
     setImageFile(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const data = {
-      ...formData,
-      image: imageFile,
-    };
-
-    console.log('Client Data:', data);
+    try {
+      const token = localStorage.getItem("token");
+      
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('phone', formData.phone);
+      data.append('address', formData.address);
+      data.append('description', formData.description);
+      if (imageFile) {
+        data.append('avatar', imageFile);
+      }
+      
+      await axios.post('http://localhost:5000/api/clients', data, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      toast.success('Client added successfully');
+      navigate('/clients');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to add client');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,8 +82,8 @@ const Create = () => {
 
                 <FormInput
                   label='Mobile'
-                  name='mobile'
-                  value={formData.mobile}
+                  name='phone'
+                  value={formData.phone}
                   setFormData={setFormData}
                   placeholder='Enter mobile'
                   required
@@ -93,15 +119,15 @@ const Create = () => {
             </div>
 
             <div className='card-footer text-center'>
-              <button type='submit' className='btn btn-primary px-4'>
-                Add
+              <button type='submit' className='btn btn-primary px-4' disabled={loading}>
+                {loading ? 'Adding...' : 'Add'}
               </button>
             </div>
           </form>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Create
+export default Create;

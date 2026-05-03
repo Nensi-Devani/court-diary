@@ -16,12 +16,14 @@ const Sidebar = ({navItems}) => {
         {/* Sidebar  */}
         <div className='sidebar'>
             {/* Sidebar user panel */}
-            <Link to='/profile' className='user-panel mt-3 pb-3 mb-3 d-flex mx-0'>
+            <Link to='/profile' className='user-panel mt-3 pb-3 mb-3 d-flex mx-0 align-items-center'>
                 <div className='image'>
-                    <img src={user} className='img-circle elevation-2' alt='User Image' />
+                    <div className="img-circle elevation-2 d-flex align-items-center justify-content-center bg-primary text-white" style={{width: '34px', height: '34px', fontSize: '0.8rem', fontWeight: 'bold'}}>
+                        {(localStorage.getItem("userName") || "User").split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                    </div>
                 </div>
                 <div className='info'>
-                    <span className='d-block'>User</span>
+                    <span className='d-block'>{localStorage.getItem("userName") || "User"}</span>
                 </div>
             </Link>
 

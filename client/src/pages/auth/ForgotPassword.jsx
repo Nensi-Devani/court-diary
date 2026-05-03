@@ -1,19 +1,27 @@
 // src/pages/auth/ForgotPassword.jsx
 import React, { useState } from 'react';
 import FormInput from '../../components/form/FormInput';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const ForgotPassword = () => {
   const [formData, setFormData] = useState({
     email: '',
   });
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('Forgot Password Email:', formData.email);
-
-    alert('Password reset link sent (demo)');
+    try {
+      await axios.post("http://localhost:5000/api/auth/forgotpassword", { email: formData.email });
+      toast.success("Temporary password sent to your email!");
+      navigate('/login');
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to send password");
+    }
   };
 
   return (
@@ -45,7 +53,7 @@ const ForgotPassword = () => {
 
               <div className="col-12 mb-3">
                 <button type="submit" className="btn btn-primary btn-block">
-                  Send Reset Link
+                  Send New Password
                 </button>
               </div>
 

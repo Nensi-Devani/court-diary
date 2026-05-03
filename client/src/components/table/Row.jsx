@@ -3,7 +3,7 @@ import ViewBtn from '../Buttons/ViewBtn'
 import EditBtn from '../Buttons/EditBtn'
 import DeleteBtn from '../Buttons/DeleteBtn'
 
-const Row = ({ row, columns, onView, onEdit, onDelete }) => {
+const Row = ({ row, columns, onView, onEdit, onDelete, actions }) => {
   const renderCell = (col) => {
     const value = row[col.key];
     switch (col.type) {
@@ -12,7 +12,8 @@ const Row = ({ row, columns, onView, onEdit, onDelete }) => {
       case 'image':
         return <img src={value} className='img-circle' alt='img' style={{width: '50px'}}/>;
       case 'badge':
-        return <span className={`badge ${col.badgeClass || 'bg-secondary'}`}>{value}</span>;
+        const badgeColor = typeof col.badgeClass === 'function' ? col.badgeClass(value) : (col.badgeClass || 'bg-secondary');
+        return <span className={`badge ${badgeColor}`}>{value}</span>;
       default:
         return value;
     }
@@ -25,9 +26,15 @@ const Row = ({ row, columns, onView, onEdit, onDelete }) => {
         ))}
       
         <td>
-            <ViewBtn link={onView(row)} />
-            <EditBtn link={onEdit(row)} />
-            <DeleteBtn onClick={() => onDelete(row)} />
+            {actions ? (
+                actions(row)
+            ) : (
+                <>
+                    {typeof onView === 'function' && <ViewBtn link={onView(row)} />}
+                    {typeof onEdit === 'function' && <EditBtn link={onEdit(row)} />}
+                    {typeof onDelete === 'function' && <DeleteBtn onClick={() => onDelete(row)} />}
+                </>
+            )}
         </td>
     </tr>
   )
