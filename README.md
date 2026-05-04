@@ -1,7 +1,6 @@
 # Court-Diary
 
 This is a full-stack **MERN** (MongoDB, Express, React, Node.js) application.
-
 ## Getting Started
 
 ### 1. Pull the code & Open 2 different terminals

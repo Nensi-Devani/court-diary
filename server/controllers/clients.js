@@ -15,6 +15,7 @@ exports.getClients = async (req, res) => {
 
     const total = await Client.countDocuments(query);
     
+    
     // Use aggregation to count active cases for each client
     const pipeline = [
       { $match: query },
