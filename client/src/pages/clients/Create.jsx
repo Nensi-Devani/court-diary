@@ -131,4 +131,3 @@ const Create = () => {
 };
 
 export default Create;
-//create page for clients
