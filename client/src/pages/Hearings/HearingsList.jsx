@@ -80,7 +80,7 @@ export default function HearingsList() {
               <th>Case No.</th>
               <th>Status</th>
               <th>Fee Status</th>
-              <th>Actions</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
