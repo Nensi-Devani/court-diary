@@ -59,7 +59,6 @@ exports.createCase = async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 };
-
 exports.updateCase = async (req, res) => {
   try {
     const query = req.user.role === 'admin'
